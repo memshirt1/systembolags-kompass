@@ -47,14 +47,6 @@ body{background:#1B3A28;display:flex;align-items:center;justify-content:center;m
       <line x1="37" y1="150" x2="263" y2="150" stroke="#C8BBAA" stroke-width="0.6" opacity="0.3"/>
       <line x1="66" y1="66" x2="234" y2="234" stroke="#C8BBAA" stroke-width="0.4" opacity="0.18"/>
       <line x1="234" y1="66" x2="66" y2="234" stroke="#C8BBAA" stroke-width="0.4" opacity="0.18"/>
-      <text x="150" y="48" text-anchor="middle" dominant-baseline="middle" fill="#1B3A28" font-size="18" font-weight="700">N</text>
-      <text x="150" y="254" text-anchor="middle" dominant-baseline="middle" fill="#1B3A28" font-size="15" font-weight="600">S</text>
-      <text x="255" y="151" text-anchor="middle" dominant-baseline="middle" fill="#1B3A28" font-size="15" font-weight="600">Ö</text>
-      <text x="45" y="151" text-anchor="middle" dominant-baseline="middle" fill="#1B3A28" font-size="15" font-weight="600">V</text>
-      <text x="221" y="79" text-anchor="middle" dominant-baseline="middle" fill="#8A8070" font-size="11">NO</text>
-      <text x="221" y="223" text-anchor="middle" dominant-baseline="middle" fill="#8A8070" font-size="11">SO</text>
-      <text x="79" y="223" text-anchor="middle" dominant-baseline="middle" fill="#8A8070" font-size="11">SV</text>
-      <text x="79" y="79" text-anchor="middle" dominant-baseline="middle" fill="#8A8070" font-size="11">NV</text>
     </g>
     <g id="ng">
       <path d="M150 57 L142 148 L150 163 L158 148Z" fill="#C4953A"/>
@@ -96,8 +88,8 @@ function setR(el, angle){
 }
 
 function rot(){
-  setR(rose, -deviceHeading);           // Rosen: N stannar geografiskt Norr
-  setR(ng, bearing - deviceHeading);    // Nålen: pekar mot Systembolaget
+  // Bara nålen roterar — tick marks är stilla
+  setR(ng, bearing - deviceHeading);
 }
 
 function handleOrientation(e){
