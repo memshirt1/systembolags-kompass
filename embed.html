@@ -18,7 +18,7 @@ body{background:#1B3A28;display:flex;align-items:center;justify-content:center;m
 .dots{display:flex;gap:5px;justify-content:center;margin-top:8px}
 .dot{width:6px;height:6px;border-radius:50%;background:#C4953A;animation:pulse 1.2s infinite}
 .dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
-#ng{transform-origin:150px 150px;transition:transform 1.4s cubic-bezier(.34,1.56,.64,1)}
+#ng{transform-origin:150px 150px;transition:transform 0.3s ease-out}
 @keyframes pulse{0%,100%{opacity:.2}50%{opacity:1}}
 </style>
 </head>
@@ -61,13 +61,13 @@ body{background:#1B3A28;display:flex;align-items:center;justify-content:center;m
       <circle cx="150" cy="150" r="4" fill="#C4953A"/>
     </g>
   </svg>
-
   <div class="info" id="inf">
     <button class="btn" onclick="go()">Hitta närmaste Systembolaget</button>
   </div>
 </div>
 
 <script>
+// Tick marks
 const tg=document.getElementById('tks');
 for(let i=0;i<72;i++){
   const d=i*5,r=d*Math.PI/180,c=d%90===0,m=d%45===0&&d%90!==0;
@@ -82,20 +82,68 @@ for(let i=0;i<72;i++){
 }
 
 const ng=document.getElementById('ng'),inf=document.getElementById('inf');
-let bearing=0,alpha=0,disp=0,active=false;
+let bearing=0, deviceHeading=0, disp=0, active=false;
 
-function rot(){const diff=((bearing-alpha-disp)%360+540)%360-180;disp+=diff;ng.style.transform=`rotate(${disp}deg)`;}
-['deviceorientationabsolute','deviceorientation'].forEach(ev=>{
-  window.addEventListener(ev,e=>{const a=e.webkitCompassHeading??e.alpha??0;if(ev==='deviceorientation'&&e.absolute)return;alpha=a;if(active)rot();},true);
-});
-function bea(la1,lo1,la2,lo2){const f1=la1*Math.PI/180,f2=la2*Math.PI/180,dl=(lo2-lo1)*Math.PI/180;return(Math.atan2(Math.sin(dl)*Math.cos(f2),Math.cos(f1)*Math.sin(f2)-Math.sin(f1)*Math.cos(f2)*Math.cos(dl))*180/Math.PI+360)%360;}
-function dst(la1,lo1,la2,lo2){const R=6371,f1=la1*Math.PI/180,f2=la2*Math.PI/180,df=(la2-la1)*Math.PI/180,dl=(lo2-lo1)*Math.PI/180;const a=Math.sin(df/2)**2+Math.cos(f1)*Math.cos(f2)*Math.sin(dl/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
+// Rotera nålen — kompenserar för telefonens riktning
+function rot(){
+  const target = bearing - deviceHeading;
+  const diff = ((target - disp) % 360 + 540) % 360 - 180;
+  disp += diff;
+  ng.style.transform = `rotate(${disp}deg)`;
+}
+
+// Hantera kompassriktning från telefonen
+function handleOrientation(e) {
+  if (e.webkitCompassHeading != null) {
+    // iOS — direkt kompassriktning (0=N, ökar medurs)
+    deviceHeading = e.webkitCompassHeading;
+  } else if (e.alpha != null) {
+    // Android — alpha är moturs, konvertera till medurs
+    deviceHeading = (360 - e.alpha) % 360;
+  } else {
+    return;
+  }
+  if (active) rot();
+}
+
+// Android: deviceorientationabsolute ger absolut kompassriktning
+window.addEventListener('deviceorientationabsolute', handleOrientation, true);
+
+// iOS + äldre Android
+window.addEventListener('deviceorientation', e => {
+  // Använd bara om iOS (webkitCompassHeading) eller absolut
+  if (e.webkitCompassHeading != null || e.absolute) {
+    handleOrientation(e);
+  }
+}, true);
+
+// Matematik
+function bea(la1,lo1,la2,lo2){
+  const f1=la1*Math.PI/180,f2=la2*Math.PI/180,dl=(lo2-lo1)*Math.PI/180;
+  return(Math.atan2(Math.sin(dl)*Math.cos(f2),Math.cos(f1)*Math.sin(f2)-Math.sin(f1)*Math.cos(f2)*Math.cos(dl))*180/Math.PI+360)%360;
+}
+function dst(la1,lo1,la2,lo2){
+  const R=6371,f1=la1*Math.PI/180,f2=la2*Math.PI/180,df=(la2-la1)*Math.PI/180,dl=(lo2-lo1)*Math.PI/180;
+  const a=Math.sin(df/2)**2+Math.cos(f1)*Math.cos(f2)*Math.sin(dl/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
 function nearest(la,lo,s){return s.reduce((b,x)=>dst(la,lo,x.la,x.lo)<dst(la,lo,b.la,b.lo)?x:b);}
 function load(m){inf.innerHTML=`<div class="stxt">${m}</div><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;}
 
 async function go(){
+  // iOS 13+ kräver tillstånd för kompassdata — fråga vid knapptryckning
+  if(typeof DeviceOrientationEvent!=='undefined' && typeof DeviceOrientationEvent.requestPermission==='function'){
+    try{
+      const perm = await DeviceOrientationEvent.requestPermission();
+      if(perm==='granted'){
+        window.addEventListener('deviceorientation', handleOrientation, true);
+      }
+    }catch(e){}
+  }
+
   if(!navigator.geolocation){inf.innerHTML='<div class="stxt">GPS stöds inte här.</div>';return;}
   load('Hämtar position...');
+
   navigator.geolocation.getCurrentPosition(async({coords:{latitude:la,longitude:lo}})=>{
     load('Söker närmaste system...');
     let st=[];
@@ -103,13 +151,20 @@ async function go(){
       const q=`[out:json][timeout:12];node["name"="Systembolaget"](around:200000,${la},${lo});out body;`;
       const r=await fetch('https://overpass-api.de/api/interpreter',{method:'POST',body:'data='+encodeURIComponent(q)});
       const d=await r.json();
-      st=d.elements.filter(e=>e.lat&&e.lon).map(e=>({n:e.tags?.['addr:city']?`Systembolaget ${e.tags['addr:city']}`:'Systembolaget',la:e.lat,lo:e.lon}));
+      st=d.elements.filter(e=>e.lat&&e.lon).map(e=>({
+        n:e.tags?.['addr:city']?`Systembolaget ${e.tags['addr:city']}`:'Systembolaget',
+        la:e.lat,lo:e.lon
+      }));
     }catch(e){}
+
     if(!st.length){inf.innerHTML='<div class="stxt">Kunde inte hämta data. Försök igen.</div>';return;}
+
     const nr=nearest(la,lo,st);
     const km=dst(la,lo,nr.la,nr.lo);
     bearing=bea(la,lo,nr.la,nr.lo);
-    active=true;rot();
+    active=true;
+    rot();
+
     inf.innerHTML=`<div class="sname">${nr.n}</div><div class="sdist">${km.toFixed(1)} <span>km bort</span></div>`;
   },
   ()=>inf.innerHTML='<div class="stxt">Tillåt GPS i webbläsaren.</div>',
