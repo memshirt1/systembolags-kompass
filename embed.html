@@ -18,15 +18,12 @@ body{background:#1B3A28;display:flex;align-items:center;justify-content:center;m
 .dots{display:flex;gap:5px;justify-content:center;margin-top:6px}
 .dot{width:6px;height:6px;border-radius:50%;background:#C4953A;animation:pulse 1.2s infinite}
 .dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
-.perm-row{display:flex;align-items:center;gap:8px;color:#8FAD9E;font-size:11px}
-.perm-dot{width:8px;height:8px;border-radius:50%;background:#4A7A60;flex-shrink:0}
-.perm-dot.ok{background:#C4953A}
 @keyframes pulse{0%,100%{opacity:.2}50%{opacity:1}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <svg id="svg" width="256" height="256" viewBox="0 0 300 300">
+  <svg width="256" height="256" viewBox="0 0 300 300">
     <defs>
       <radialGradient id="fG" cx="38%" cy="32%">
         <stop offset="0%" stop-color="#FAF5E5"/>
@@ -37,17 +34,17 @@ body{background:#1B3A28;display:flex;align-items:center;justify-content:center;m
         <stop offset="100%" stop-color="#0F2416"/>
       </radialGradient>
     </defs>
+    <!-- Statisk ytterkrets + tick marks -->
     <circle cx="150" cy="150" r="147" fill="#0F2416" opacity="0.5"/>
-    <g id="rose">
-      <circle cx="150" cy="150" r="143" fill="url(#bG)"/>
-      <g id="tks"></g>
-      <circle cx="150" cy="150" r="126" fill="none" stroke="#C4953A" stroke-width="1.5"/>
-      <circle cx="150" cy="150" r="118" fill="url(#fG)"/>
-      <line x1="150" y1="37" x2="150" y2="263" stroke="#C8BBAA" stroke-width="0.6" opacity="0.3"/>
-      <line x1="37" y1="150" x2="263" y2="150" stroke="#C8BBAA" stroke-width="0.6" opacity="0.3"/>
-      <line x1="66" y1="66" x2="234" y2="234" stroke="#C8BBAA" stroke-width="0.4" opacity="0.18"/>
-      <line x1="234" y1="66" x2="66" y2="234" stroke="#C8BBAA" stroke-width="0.4" opacity="0.18"/>
-    </g>
+    <circle cx="150" cy="150" r="143" fill="url(#bG)"/>
+    <g id="tks"></g>
+    <circle cx="150" cy="150" r="126" fill="none" stroke="#C4953A" stroke-width="1.5"/>
+    <circle cx="150" cy="150" r="118" fill="url(#fG)"/>
+    <line x1="150" y1="37" x2="150" y2="263" stroke="#C8BBAA" stroke-width="0.6" opacity="0.25"/>
+    <line x1="37" y1="150" x2="263" y2="150" stroke="#C8BBAA" stroke-width="0.6" opacity="0.25"/>
+    <line x1="66" y1="66" x2="234" y2="234" stroke="#C8BBAA" stroke-width="0.4" opacity="0.15"/>
+    <line x1="234" y1="66" x2="66" y2="234" stroke="#C8BBAA" stroke-width="0.4" opacity="0.15"/>
+    <!-- Enbart nålen rör sig -->
     <g id="ng">
       <path d="M150 57 L142 148 L150 163 L158 148Z" fill="#C4953A"/>
       <path d="M150 57 L147 118 L150 163Z" fill="rgba(255,220,100,0.22)"/>
@@ -56,16 +53,13 @@ body{background:#1B3A28;display:flex;align-items:center;justify-content:center;m
       <circle cx="150" cy="150" r="4" fill="#C4953A"/>
     </g>
   </svg>
-
   <div class="info" id="inf">
     <button class="btn" onclick="start()">Starta kompassen</button>
   </div>
 </div>
-
 <script>
-const rose = document.getElementById('rose');
-const ng   = document.getElementById('ng');
-const inf  = document.getElementById('inf');
+const ng  = document.getElementById('ng');
+const inf = document.getElementById('inf');
 
 // Tick marks
 const tg = document.getElementById('tks');
@@ -73,42 +67,58 @@ for(let i=0;i<72;i++){
   const d=i*5,r=d*Math.PI/180,c=d%90===0,m=d%45===0&&d%90!==0;
   const oR=143,iR=c?oR-16:m?oR-11:oR-6;
   const l=document.createElementNS('http://www.w3.org/2000/svg','line');
-  l.setAttribute('x1',150+oR*Math.sin(r)); l.setAttribute('y1',150-oR*Math.cos(r));
-  l.setAttribute('x2',150+iR*Math.sin(r)); l.setAttribute('y2',150-iR*Math.cos(r));
+  l.setAttribute('x1',150+oR*Math.sin(r));l.setAttribute('y1',150-oR*Math.cos(r));
+  l.setAttribute('x2',150+iR*Math.sin(r));l.setAttribute('y2',150-iR*Math.cos(r));
   l.setAttribute('stroke',c?'#C4953A':m?'#6B9B7A':'#4A7A60');
   l.setAttribute('stroke-width',c?'2':m?'1.2':'0.7');
   l.setAttribute('stroke-linecap','round');
   tg.appendChild(l);
 }
 
-let bearing=0, deviceHeading=0, active=false, compassGranted=false;
+let bearing=0, deviceHeading=0, active=false;
+let storeLat, storeLon;
 
-function setR(el, angle){
-  el.setAttribute('transform',`rotate(${angle},150,150)`);
-}
+function setR(el,a){ el.setAttribute('transform',`rotate(${a},150,150)`); }
 
 function rot(){
-  // Bara nålen roterar — tick marks är stilla
+  // Nålen pekar mot Systembolaget — justeras för telefonens riktning
   setR(ng, bearing - deviceHeading);
 }
 
+// PRIMÄR: Enhetsorientering (kompass) — iOS och Android
 function handleOrientation(e){
-  let h = null;
-  if(e.webkitCompassHeading != null){
-    h = e.webkitCompassHeading;         // iOS: direkt kompassriktning
-  } else if(e.alpha != null){
-    h = (360 - e.alpha) % 360;          // Android: konvertera till medurs
+  let h=null;
+  if(e.webkitCompassHeading!=null){
+    h=e.webkitCompassHeading;          // iOS: direkt kompassriktning
+  } else if(e.alpha!=null && e.absolute){
+    h=(360-e.alpha)%360;               // Android absolute: konvertera
   }
-  if(h === null) return;
-  deviceHeading = h;
+  if(h===null) return;
+  deviceHeading=h;
   if(active) rot();
 }
+window.addEventListener('deviceorientationabsolute',handleOrientation,true);
+window.addEventListener('deviceorientation',e=>{
+  if(e.webkitCompassHeading!=null||e.absolute) handleOrientation(e);
+},true);
 
-// Lägg till lyssnare för Android och äldre iOS (kräver inte tillstånd)
-window.addEventListener('deviceorientationabsolute', handleOrientation, true);
-window.addEventListener('deviceorientation', e => {
-  if(e.webkitCompassHeading != null || e.absolute) handleOrientation(e);
-}, true);
+// BACKUP: GPS-riktning när du rör på dig
+function handleGPSHeading(pos){
+  const {latitude:la,longitude:lo,heading:h,speed:sp}=pos.coords;
+  // Uppdatera avstånd och bäring löpande
+  if(storeLat && active){
+    bearing=bea(la,lo,storeLat,storeLon);
+    const km=dst(la,lo,storeLat,storeLon);
+    const nameEl=document.querySelector('.sname');
+    const distEl=document.querySelector('.sdist');
+    if(nameEl&&distEl) distEl.innerHTML=`${km.toFixed(1)} <span>km bort</span>`;
+  }
+  // Använd GPS-riktning som backup om du rör på dig (>0.5 m/s)
+  if(h!==null && sp!==null && sp>0.5){
+    deviceHeading=h;
+  }
+  if(active) rot();
+}
 
 function bea(la1,lo1,la2,lo2){
   const f1=la1*Math.PI/180,f2=la2*Math.PI/180,dl=(lo2-lo1)*Math.PI/180;
@@ -123,71 +133,51 @@ function nearest(la,lo,s){return s.reduce((b,x)=>dst(la,lo,x.la,x.lo)<dst(la,lo,
 function load(m){inf.innerHTML=`<div class="stxt">${m}</div><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;}
 
 async function start(){
-  inf.innerHTML = `
-    <div class="perm-row"><div class="perm-dot" id="pd1"></div><span>Kompass & riktning</span></div>
-    <div class="perm-row"><div class="perm-dot" id="pd2"></div><span>Plats (GPS)</span></div>`;
-
-  // Steg 1: Begär kompassåtkomst (iOS 13+)
-  if(typeof DeviceOrientationEvent !== 'undefined' &&
-     typeof DeviceOrientationEvent.requestPermission === 'function'){
+  // iOS 13+: begär kompasstillstånd vid knapptryckning
+  if(typeof DeviceOrientationEvent!=='undefined'&&
+     typeof DeviceOrientationEvent.requestPermission==='function'){
     try{
-      const result = await DeviceOrientationEvent.requestPermission();
-      compassGranted = result === 'granted';
-      if(compassGranted){
-        window.addEventListener('deviceorientation', handleOrientation, true);
-        document.getElementById('pd1').classList.add('ok');
-      }
-    }catch(e){
-      compassGranted = false;
-    }
-  } else {
-    // Android / webbläsare som inte kräver tillstånd
-    compassGranted = true;
-    const d1 = document.getElementById('pd1');
-    if(d1) d1.classList.add('ok');
+      const p=await DeviceOrientationEvent.requestPermission();
+      if(p==='granted') window.addEventListener('deviceorientation',handleOrientation,true);
+    }catch(e){}
   }
 
-  // Steg 2: Begär GPS
   if(!navigator.geolocation){
     inf.innerHTML='<div class="stxt">GPS stöds inte i den här webbläsaren.</div>';
     return;
   }
+  load('Hämtar position...');
 
+  // Engångshämtning för att hitta närmaste butik
   navigator.geolocation.getCurrentPosition(async({coords:{latitude:la,longitude:lo}})=>{
-    const d2 = document.getElementById('pd2');
-    if(d2) d2.classList.add('ok');
     load('Söker närmaste system...');
-
     let st=[];
     try{
       const q=`[out:json][timeout:12];node["name"="Systembolaget"](around:200000,${la},${lo});out body;`;
       const r=await fetch('https://overpass-api.de/api/interpreter',{method:'POST',body:'data='+encodeURIComponent(q)});
       const d=await r.json();
       st=d.elements.filter(e=>e.lat&&e.lon).map(e=>({
-        n: e.tags?.['addr:city'] ? `Systembolaget ${e.tags['addr:city']}` : 'Systembolaget',
-        la:e.lat, lo:e.lon
+        n:e.tags?.['addr:city']?`Systembolaget ${e.tags['addr:city']}`:'Systembolaget',
+        la:e.lat,lo:e.lon
       }));
     }catch(e){}
+    if(!st.length){inf.innerHTML='<div class="stxt">Kunde inte hämta data.</div>';return;}
 
-    if(!st.length){
-      inf.innerHTML='<div class="stxt">Kunde inte hämta data. Kontrollera internet och försök igen.</div>';
-      return;
-    }
-
-    const nr = nearest(la,lo,st);
-    bearing = bea(la,lo,nr.la,nr.lo);
-    active = true;
+    const nr=nearest(la,lo,st);
+    storeLat=nr.la; storeLon=nr.lo;
+    bearing=bea(la,lo,nr.la,nr.lo);
+    active=true;
     rot();
 
-    inf.innerHTML=`
-      <div class="sname">${nr.n}</div>
-      <div class="sdist">${dst(la,lo,nr.la,nr.lo).toFixed(1)} <span>km bort</span></div>`;
+    inf.innerHTML=`<div class="sname">${nr.n}</div>
+    <div class="sdist">${dst(la,lo,nr.la,nr.lo).toFixed(1)} <span>km bort</span></div>`;
+
+    // Starta kontinuerlig GPS-spårning för uppdaterat avstånd + backup-riktning
+    navigator.geolocation.watchPosition(handleGPSHeading,null,{enableHighAccuracy:true});
   },
-  err => {
-    inf.innerHTML=`<div class="stxt">Platsåtkomst nekad. Tillåt GPS och försök igen.</div>
-    <button class="btn-sec" onclick="start()">Försök igen</button>`;
-  },
-  {enableHighAccuracy:true, timeout:10000});
+  ()=>inf.innerHTML=`<div class="stxt">Platsåtkomst nekad.</div>
+    <button class="btn-sec" style="margin-top:6px" onclick="start()">Försök igen</button>`,
+  {enableHighAccuracy:true,timeout:10000});
 }
 </script>
 </body>
