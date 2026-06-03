@@ -25,6 +25,17 @@ h1{color:#F3EDD8;font-size:22px;font-weight:700;margin-bottom:6px}
 .hint{color:#4A7A60;font-size:11px;margin-top:16px;opacity:.75}
 #ng{transform-origin:150px 150px;transition:transform 1.4s cubic-bezier(.34,1.56,.64,1)}
 @keyframes pulse{0%,100%{opacity:.2}50%{opacity:1}}
+/* Kompakt inbäddningsläge */
+body.embed{min-height:0;padding:6px 8px 10px}
+body.embed .brand,body.embed h1,body.embed .hint{display:none}
+body.embed .tagline{font-size:11px;margin-bottom:4px;min-height:14px}
+body.embed .cx{margin-bottom:4px}
+body.embed .cx svg{width:228px!important;height:228px!important}
+body.embed .info{min-height:44px}
+body.embed .sdist{font-size:22px}
+body.embed .sname{font-size:11px}
+body.embed .btn{padding:8px 18px;font-size:12px}
+body.embed .stxt{font-size:11px}
 </style>
 </head>
 <body>
@@ -95,6 +106,11 @@ for(let i=0;i<72;i++){
   tg.appendChild(l);
 }
 
+// Aktivera kompakt läge + autostart vid ?embed=1
+if(new URLSearchParams(location.search).has('embed')){
+  document.body.classList.add('embed');
+  window.addEventListener('load', ()=> setTimeout(go, 300));
+}
 const ng=document.getElementById('ng'), gr=document.getElementById('gr'),
       inf=document.getElementById('inf'), tgl=document.getElementById('tg');
 let bearing=0, alpha=0, disp=0, active=false;
