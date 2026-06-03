@@ -14,10 +14,12 @@ body{background:#1B3A28;display:flex;align-items:center;justify-content:center;m
 .sdist span{font-size:13px;font-weight:400;color:#8FAD9E}
 .stxt{color:#8FAD9E;font-size:12px;line-height:1.5;max-width:240px}
 .btn{background:#C4953A;color:#1B3A28;border:none;border-radius:9px;padding:10px 22px;font-size:13px;font-weight:600;cursor:pointer;transition:opacity .2s}
-.btn:hover{opacity:.85}
 .dots{display:flex;gap:5px;justify-content:center;margin-top:8px}
 .dot{width:6px;height:6px;border-radius:50%;background:#C4953A;animation:pulse 1.2s infinite}
 .dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+/* Kompassen roterar för att N alltid pekar geografiskt Norr */
+#compass-rose{transform-origin:150px 150px;transition:transform 0.12s linear}
+/* Nålen pekar mot Systembolaget i absolut riktning */
 #ng{transform-origin:150px 150px;transition:transform 0.3s ease-out}
 @keyframes pulse{0%,100%{opacity:.2}50%{opacity:1}}
 </style>
@@ -35,32 +37,43 @@ body{background:#1B3A28;display:flex;align-items:center;justify-content:center;m
         <stop offset="100%" stop-color="#0F2416"/>
       </radialGradient>
     </defs>
+
+    <!-- Statisk skugga (roterar inte) -->
     <circle cx="150" cy="150" r="147" fill="#0F2416" opacity="0.5"/>
-    <circle cx="150" cy="150" r="143" fill="url(#bG)"/>
-    <g id="tks"></g>
-    <circle cx="150" cy="150" r="126" fill="none" stroke="#C4953A" stroke-width="1.5"/>
-    <circle cx="150" cy="150" r="123" fill="none" stroke="#C4953A" stroke-width="0.5" opacity="0.3"/>
-    <circle cx="150" cy="150" r="118" fill="url(#fG)"/>
-    <line x1="150" y1="37" x2="150" y2="263" stroke="#C8BBAA" stroke-width="0.6" opacity="0.35"/>
-    <line x1="37" y1="150" x2="263" y2="150" stroke="#C8BBAA" stroke-width="0.6" opacity="0.35"/>
-    <line x1="66" y1="66" x2="234" y2="234" stroke="#C8BBAA" stroke-width="0.4" opacity="0.2"/>
-    <line x1="234" y1="66" x2="66" y2="234" stroke="#C8BBAA" stroke-width="0.4" opacity="0.2"/>
-    <text x="150" y="48" text-anchor="middle" dominant-baseline="middle" fill="#1B3A28" font-size="18" font-weight="700">N</text>
-    <text x="150" y="254" text-anchor="middle" dominant-baseline="middle" fill="#1B3A28" font-size="15" font-weight="600">S</text>
-    <text x="255" y="151" text-anchor="middle" dominant-baseline="middle" fill="#1B3A28" font-size="15" font-weight="600">Ö</text>
-    <text x="45" y="151" text-anchor="middle" dominant-baseline="middle" fill="#1B3A28" font-size="15" font-weight="600">V</text>
-    <text x="221" y="79" text-anchor="middle" dominant-baseline="middle" fill="#8A8070" font-size="11">NO</text>
-    <text x="221" y="223" text-anchor="middle" dominant-baseline="middle" fill="#8A8070" font-size="11">SO</text>
-    <text x="79" y="223" text-anchor="middle" dominant-baseline="middle" fill="#8A8070" font-size="11">SV</text>
-    <text x="79" y="79" text-anchor="middle" dominant-baseline="middle" fill="#8A8070" font-size="11">NV</text>
-    <g id="ng">
-      <path d="M150 57 L142 148 L150 163 L158 148Z" fill="#C4953A"/>
-      <path d="M150 57 L147 118 L150 163Z" fill="rgba(255,220,100,0.22)"/>
-      <path d="M150 210 L154 158 L150 163 L146 158Z" fill="#C4953A" opacity="0.35"/>
-      <circle cx="150" cy="150" r="11" fill="#1B3A28" stroke="#C4953A" stroke-width="2.5"/>
-      <circle cx="150" cy="150" r="4" fill="#C4953A"/>
+
+    <!-- Hela kompassen roterar så att N alltid pekar geografiskt Norr -->
+    <g id="compass-rose">
+      <circle cx="150" cy="150" r="143" fill="url(#bG)"/>
+      <g id="tks"></g>
+      <circle cx="150" cy="150" r="126" fill="none" stroke="#C4953A" stroke-width="1.5"/>
+      <circle cx="150" cy="150" r="123" fill="none" stroke="#C4953A" stroke-width="0.5" opacity="0.3"/>
+      <circle cx="150" cy="150" r="118" fill="url(#fG)"/>
+      <line x1="150" y1="37" x2="150" y2="263" stroke="#C8BBAA" stroke-width="0.6" opacity="0.35"/>
+      <line x1="37" y1="150" x2="263" y2="150" stroke="#C8BBAA" stroke-width="0.6" opacity="0.35"/>
+      <line x1="66" y1="66" x2="234" y2="234" stroke="#C8BBAA" stroke-width="0.4" opacity="0.2"/>
+      <line x1="234" y1="66" x2="66" y2="234" stroke="#C8BBAA" stroke-width="0.4" opacity="0.2"/>
+      <!-- Väderstreck -->
+      <text x="150" y="48" text-anchor="middle" dominant-baseline="middle" fill="#1B3A28" font-size="18" font-weight="700">N</text>
+      <text x="150" y="254" text-anchor="middle" dominant-baseline="middle" fill="#1B3A28" font-size="15" font-weight="600">S</text>
+      <text x="255" y="151" text-anchor="middle" dominant-baseline="middle" fill="#1B3A28" font-size="15" font-weight="600">Ö</text>
+      <text x="45" y="151" text-anchor="middle" dominant-baseline="middle" fill="#1B3A28" font-size="15" font-weight="600">V</text>
+      <text x="221" y="79" text-anchor="middle" dominant-baseline="middle" fill="#8A8070" font-size="11">NO</text>
+      <text x="221" y="223" text-anchor="middle" dominant-baseline="middle" fill="#8A8070" font-size="11">SO</text>
+      <text x="79" y="223" text-anchor="middle" dominant-baseline="middle" fill="#8A8070" font-size="11">SV</text>
+      <text x="79" y="79" text-anchor="middle" dominant-baseline="middle" fill="#8A8070" font-size="11">NV</text>
+
+      <!-- Nålen är inne i kompasrosen — dess rotation adderas med rosens -->
+      <!-- Nålen roterar till absolut bäring → skärmvinkel = bearing + (-deviceHeading) = bearing - deviceHeading ✓ -->
+      <g id="ng">
+        <path d="M150 57 L142 148 L150 163 L158 148Z" fill="#C4953A"/>
+        <path d="M150 57 L147 118 L150 163Z" fill="rgba(255,220,100,0.22)"/>
+        <path d="M150 210 L154 158 L150 163 L146 158Z" fill="#C4953A" opacity="0.35"/>
+        <circle cx="150" cy="150" r="11" fill="#1B3A28" stroke="#C4953A" stroke-width="2.5"/>
+        <circle cx="150" cy="150" r="4" fill="#C4953A"/>
+      </g>
     </g>
   </svg>
+
   <div class="info" id="inf">
     <button class="btn" onclick="go()">Hitta närmaste Systembolaget</button>
   </div>
@@ -81,43 +94,34 @@ for(let i=0;i<72;i++){
   tg.appendChild(l);
 }
 
-const ng=document.getElementById('ng'),inf=document.getElementById('inf');
-let bearing=0, deviceHeading=0, disp=0, active=false;
+const roseEl = document.getElementById('compass-rose');
+const ng = document.getElementById('ng');
+const inf = document.getElementById('inf');
 
-// Rotera nålen — kompenserar för telefonens riktning
-function rot(){
-  const target = bearing - deviceHeading;
-  const diff = ((target - disp) % 360 + 540) % 360 - 180;
-  disp += diff;
-  ng.style.transform = `rotate(${disp}deg)`;
+let bearing = 0, deviceHeading = 0, active = false;
+
+function rot() {
+  // Kompasrosen roterar MOTURS med telefonens riktning → N pekar alltid geografiskt Norr
+  roseEl.style.transform = `rotate(${-deviceHeading}deg)`;
+  // Nålen (inne i rosen) roterar till absolut bäring → adderas med rosens rotation
+  // Skärmresultat: bearing + (-deviceHeading) = bearing - deviceHeading ✓
+  ng.style.transform = `rotate(${bearing}deg)`;
 }
 
-// Hantera kompassriktning från telefonen
 function handleOrientation(e) {
   if (e.webkitCompassHeading != null) {
-    // iOS — direkt kompassriktning (0=N, ökar medurs)
-    deviceHeading = e.webkitCompassHeading;
+    deviceHeading = e.webkitCompassHeading; // iOS: 0=N, ökar medurs
   } else if (e.alpha != null) {
-    // Android — alpha är moturs, konvertera till medurs
-    deviceHeading = (360 - e.alpha) % 360;
-  } else {
-    return;
-  }
+    deviceHeading = (360 - e.alpha) % 360; // Android: konvertera moturs→medurs
+  } else return;
   if (active) rot();
 }
 
-// Android: deviceorientationabsolute ger absolut kompassriktning
 window.addEventListener('deviceorientationabsolute', handleOrientation, true);
-
-// iOS + äldre Android
 window.addEventListener('deviceorientation', e => {
-  // Använd bara om iOS (webkitCompassHeading) eller absolut
-  if (e.webkitCompassHeading != null || e.absolute) {
-    handleOrientation(e);
-  }
+  if (e.webkitCompassHeading != null || e.absolute) handleOrientation(e);
 }, true);
 
-// Matematik
 function bea(la1,lo1,la2,lo2){
   const f1=la1*Math.PI/180,f2=la2*Math.PI/180,dl=(lo2-lo1)*Math.PI/180;
   return(Math.atan2(Math.sin(dl)*Math.cos(f2),Math.cos(f1)*Math.sin(f2)-Math.sin(f1)*Math.cos(f2)*Math.cos(dl))*180/Math.PI+360)%360;
@@ -131,19 +135,15 @@ function nearest(la,lo,s){return s.reduce((b,x)=>dst(la,lo,x.la,x.lo)<dst(la,lo,
 function load(m){inf.innerHTML=`<div class="stxt">${m}</div><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;}
 
 async function go(){
-  // iOS 13+ kräver tillstånd för kompassdata — fråga vid knapptryckning
-  if(typeof DeviceOrientationEvent!=='undefined' && typeof DeviceOrientationEvent.requestPermission==='function'){
+  // iOS 13+ kräver tillstånd via knapptryckning
+  if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){
     try{
-      const perm = await DeviceOrientationEvent.requestPermission();
-      if(perm==='granted'){
-        window.addEventListener('deviceorientation', handleOrientation, true);
-      }
+      const p=await DeviceOrientationEvent.requestPermission();
+      if(p==='granted') window.addEventListener('deviceorientation',handleOrientation,true);
     }catch(e){}
   }
-
   if(!navigator.geolocation){inf.innerHTML='<div class="stxt">GPS stöds inte här.</div>';return;}
   load('Hämtar position...');
-
   navigator.geolocation.getCurrentPosition(async({coords:{latitude:la,longitude:lo}})=>{
     load('Söker närmaste system...');
     let st=[];
@@ -151,20 +151,14 @@ async function go(){
       const q=`[out:json][timeout:12];node["name"="Systembolaget"](around:200000,${la},${lo});out body;`;
       const r=await fetch('https://overpass-api.de/api/interpreter',{method:'POST',body:'data='+encodeURIComponent(q)});
       const d=await r.json();
-      st=d.elements.filter(e=>e.lat&&e.lon).map(e=>({
-        n:e.tags?.['addr:city']?`Systembolaget ${e.tags['addr:city']}`:'Systembolaget',
-        la:e.lat,lo:e.lon
-      }));
+      st=d.elements.filter(e=>e.lat&&e.lon).map(e=>({n:e.tags?.['addr:city']?`Systembolaget ${e.tags['addr:city']}`:'Systembolaget',la:e.lat,lo:e.lon}));
     }catch(e){}
-
     if(!st.length){inf.innerHTML='<div class="stxt">Kunde inte hämta data. Försök igen.</div>';return;}
-
     const nr=nearest(la,lo,st);
     const km=dst(la,lo,nr.la,nr.lo);
     bearing=bea(la,lo,nr.la,nr.lo);
     active=true;
     rot();
-
     inf.innerHTML=`<div class="sname">${nr.n}</div><div class="sdist">${km.toFixed(1)} <span>km bort</span></div>`;
   },
   ()=>inf.innerHTML='<div class="stxt">Tillåt GPS i webbläsaren.</div>',
