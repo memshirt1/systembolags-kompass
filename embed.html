@@ -13,20 +13,16 @@ body{background:#1B3A28;display:flex;align-items:center;justify-content:center;m
 .sdist{color:#F3EDD8;font-size:28px;font-weight:700;line-height:1}
 .sdist span{font-size:13px;font-weight:400;color:#8FAD9E}
 .stxt{color:#8FAD9E;font-size:12px;line-height:1.5;max-width:240px}
-.btn{background:#C4953A;color:#1B3A28;border:none;border-radius:9px;padding:10px 22px;font-size:13px;font-weight:600;cursor:pointer;transition:opacity .2s}
+.btn{background:#C4953A;color:#1B3A28;border:none;border-radius:9px;padding:10px 22px;font-size:13px;font-weight:600;cursor:pointer}
 .dots{display:flex;gap:5px;justify-content:center;margin-top:8px}
 .dot{width:6px;height:6px;border-radius:50%;background:#C4953A;animation:pulse 1.2s infinite}
 .dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
-/* Kompassen roterar för att N alltid pekar geografiskt Norr */
-#compass-rose{transform-origin:150px 150px;transition:transform 0.12s linear}
-/* Nålen pekar mot Systembolaget i absolut riktning */
-#ng{transform-origin:150px 150px;transition:transform 0.3s ease-out}
 @keyframes pulse{0%,100%{opacity:.2}50%{opacity:1}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <svg width="260" height="260" viewBox="0 0 300 300">
+  <svg id="svg" width="260" height="260" viewBox="0 0 300 300">
     <defs>
       <radialGradient id="fG" cx="38%" cy="32%">
         <stop offset="0%" stop-color="#FAF5E5"/>
@@ -37,22 +33,17 @@ body{background:#1B3A28;display:flex;align-items:center;justify-content:center;m
         <stop offset="100%" stop-color="#0F2416"/>
       </radialGradient>
     </defs>
-
-    <!-- Statisk skugga (roterar inte) -->
     <circle cx="150" cy="150" r="147" fill="#0F2416" opacity="0.5"/>
-
-    <!-- Hela kompassen roterar så att N alltid pekar geografiskt Norr -->
-    <g id="compass-rose">
+    <!-- Kompasrosen roterar moturs med telefonen → N pekar alltid geografiskt Norr -->
+    <g id="rose">
       <circle cx="150" cy="150" r="143" fill="url(#bG)"/>
       <g id="tks"></g>
       <circle cx="150" cy="150" r="126" fill="none" stroke="#C4953A" stroke-width="1.5"/>
-      <circle cx="150" cy="150" r="123" fill="none" stroke="#C4953A" stroke-width="0.5" opacity="0.3"/>
       <circle cx="150" cy="150" r="118" fill="url(#fG)"/>
-      <line x1="150" y1="37" x2="150" y2="263" stroke="#C8BBAA" stroke-width="0.6" opacity="0.35"/>
-      <line x1="37" y1="150" x2="263" y2="150" stroke="#C8BBAA" stroke-width="0.6" opacity="0.35"/>
-      <line x1="66" y1="66" x2="234" y2="234" stroke="#C8BBAA" stroke-width="0.4" opacity="0.2"/>
-      <line x1="234" y1="66" x2="66" y2="234" stroke="#C8BBAA" stroke-width="0.4" opacity="0.2"/>
-      <!-- Väderstreck -->
+      <line x1="150" y1="37" x2="150" y2="263" stroke="#C8BBAA" stroke-width="0.6" opacity="0.3"/>
+      <line x1="37" y1="150" x2="263" y2="150" stroke="#C8BBAA" stroke-width="0.6" opacity="0.3"/>
+      <line x1="66" y1="66" x2="234" y2="234" stroke="#C8BBAA" stroke-width="0.4" opacity="0.18"/>
+      <line x1="234" y1="66" x2="66" y2="234" stroke="#C8BBAA" stroke-width="0.4" opacity="0.18"/>
       <text x="150" y="48" text-anchor="middle" dominant-baseline="middle" fill="#1B3A28" font-size="18" font-weight="700">N</text>
       <text x="150" y="254" text-anchor="middle" dominant-baseline="middle" fill="#1B3A28" font-size="15" font-weight="600">S</text>
       <text x="255" y="151" text-anchor="middle" dominant-baseline="middle" fill="#1B3A28" font-size="15" font-weight="600">Ö</text>
@@ -61,59 +52,65 @@ body{background:#1B3A28;display:flex;align-items:center;justify-content:center;m
       <text x="221" y="223" text-anchor="middle" dominant-baseline="middle" fill="#8A8070" font-size="11">SO</text>
       <text x="79" y="223" text-anchor="middle" dominant-baseline="middle" fill="#8A8070" font-size="11">SV</text>
       <text x="79" y="79" text-anchor="middle" dominant-baseline="middle" fill="#8A8070" font-size="11">NV</text>
-
-      <!-- Nålen är inne i kompasrosen — dess rotation adderas med rosens -->
-      <!-- Nålen roterar till absolut bäring → skärmvinkel = bearing + (-deviceHeading) = bearing - deviceHeading ✓ -->
-      <g id="ng">
-        <path d="M150 57 L142 148 L150 163 L158 148Z" fill="#C4953A"/>
-        <path d="M150 57 L147 118 L150 163Z" fill="rgba(255,220,100,0.22)"/>
-        <path d="M150 210 L154 158 L150 163 L146 158Z" fill="#C4953A" opacity="0.35"/>
-        <circle cx="150" cy="150" r="11" fill="#1B3A28" stroke="#C4953A" stroke-width="2.5"/>
-        <circle cx="150" cy="150" r="4" fill="#C4953A"/>
-      </g>
+    </g>
+    <!-- Nålen är syskon till rosen — roteras separat till bearing - deviceHeading -->
+    <g id="ng">
+      <path d="M150 57 L142 148 L150 163 L158 148Z" fill="#C4953A"/>
+      <path d="M150 57 L147 118 L150 163Z" fill="rgba(255,220,100,0.22)"/>
+      <path d="M150 210 L154 158 L150 163 L146 158Z" fill="#C4953A" opacity="0.35"/>
+      <circle cx="150" cy="150" r="11" fill="#1B3A28" stroke="#C4953A" stroke-width="2.5"/>
+      <circle cx="150" cy="150" r="4" fill="#C4953A"/>
     </g>
   </svg>
-
   <div class="info" id="inf">
     <button class="btn" onclick="go()">Hitta närmaste Systembolaget</button>
   </div>
 </div>
-
 <script>
+const rose = document.getElementById('rose');
+const ng = document.getElementById('ng');
+const inf = document.getElementById('inf');
+
 // Tick marks
-const tg=document.getElementById('tks');
+const tg = document.getElementById('tks');
 for(let i=0;i<72;i++){
-  const d=i*5,r=d*Math.PI/180,c=d%90===0,m=d%45===0&&d%90!==0;
-  const oR=143,iR=c?oR-16:m?oR-11:oR-6;
+  const d=i*5, r=d*Math.PI/180, c=d%90===0, m=d%45===0&&d%90!==0;
+  const oR=143, iR=c?oR-16:m?oR-11:oR-6;
   const l=document.createElementNS('http://www.w3.org/2000/svg','line');
-  l.setAttribute('x1',150+oR*Math.sin(r));l.setAttribute('y1',150-oR*Math.cos(r));
-  l.setAttribute('x2',150+iR*Math.sin(r));l.setAttribute('y2',150-iR*Math.cos(r));
+  l.setAttribute('x1',150+oR*Math.sin(r)); l.setAttribute('y1',150-oR*Math.cos(r));
+  l.setAttribute('x2',150+iR*Math.sin(r)); l.setAttribute('y2',150-iR*Math.cos(r));
   l.setAttribute('stroke',c?'#C4953A':m?'#6B9B7A':'#4A7A60');
   l.setAttribute('stroke-width',c?'2':m?'1.2':'0.7');
   l.setAttribute('stroke-linecap','round');
   tg.appendChild(l);
 }
 
-const roseEl = document.getElementById('compass-rose');
-const ng = document.getElementById('ng');
-const inf = document.getElementById('inf');
-
 let bearing = 0, deviceHeading = 0, active = false;
+let roseAngle = 0, needleAngle = 0;
+
+function setRotation(el, angle) {
+  // Använd SVG transform-attributet direkt — fungerar i alla webbläsare
+  el.setAttribute('transform', `rotate(${angle}, 150, 150)`);
+}
 
 function rot() {
-  // Kompasrosen roterar MOTURS med telefonens riktning → N pekar alltid geografiskt Norr
-  roseEl.style.transform = `rotate(${-deviceHeading}deg)`;
-  // Nålen (inne i rosen) roterar till absolut bäring → adderas med rosens rotation
-  // Skärmresultat: bearing + (-deviceHeading) = bearing - deviceHeading ✓
-  ng.style.transform = `rotate(${bearing}deg)`;
+  // Rosen roterar moturs med telefonen: N stannar geografiskt Norr
+  roseAngle = -deviceHeading;
+  // Nålen pekar mot Systembolaget relativt skärmen: bearing - deviceHeading
+  needleAngle = bearing - deviceHeading;
+  setRotation(rose, roseAngle);
+  setRotation(ng, needleAngle);
 }
 
 function handleOrientation(e) {
+  let heading = null;
   if (e.webkitCompassHeading != null) {
-    deviceHeading = e.webkitCompassHeading; // iOS: 0=N, ökar medurs
+    heading = e.webkitCompassHeading; // iOS
   } else if (e.alpha != null) {
-    deviceHeading = (360 - e.alpha) % 360; // Android: konvertera moturs→medurs
-  } else return;
+    heading = (360 - e.alpha) % 360;  // Android
+  }
+  if (heading === null) return;
+  deviceHeading = heading;
   if (active) rot();
 }
 
@@ -135,7 +132,6 @@ function nearest(la,lo,s){return s.reduce((b,x)=>dst(la,lo,x.la,x.lo)<dst(la,lo,
 function load(m){inf.innerHTML=`<div class="stxt">${m}</div><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;}
 
 async function go(){
-  // iOS 13+ kräver tillstånd via knapptryckning
   if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){
     try{
       const p=await DeviceOrientationEvent.requestPermission();
@@ -153,13 +149,11 @@ async function go(){
       const d=await r.json();
       st=d.elements.filter(e=>e.lat&&e.lon).map(e=>({n:e.tags?.['addr:city']?`Systembolaget ${e.tags['addr:city']}`:'Systembolaget',la:e.lat,lo:e.lon}));
     }catch(e){}
-    if(!st.length){inf.innerHTML='<div class="stxt">Kunde inte hämta data. Försök igen.</div>';return;}
+    if(!st.length){inf.innerHTML='<div class="stxt">Kunde inte hämta data.</div>';return;}
     const nr=nearest(la,lo,st);
-    const km=dst(la,lo,nr.la,nr.lo);
     bearing=bea(la,lo,nr.la,nr.lo);
-    active=true;
-    rot();
-    inf.innerHTML=`<div class="sname">${nr.n}</div><div class="sdist">${km.toFixed(1)} <span>km bort</span></div>`;
+    active=true; rot();
+    inf.innerHTML=`<div class="sname">${nr.n}</div><div class="sdist">${dst(la,lo,nr.la,nr.lo).toFixed(1)} <span>km bort</span></div>`;
   },
   ()=>inf.innerHTML='<div class="stxt">Tillåt GPS i webbläsaren.</div>',
   {enableHighAccuracy:true,timeout:10000});
