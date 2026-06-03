@@ -3,117 +3,200 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kompass</title>
+<title>Systembolags-kompassen</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#1B3A28;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:system-ui,sans-serif}
-.wrap{text-align:center;padding:16px 12px;width:100%}
-.info{min-height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-top:6px}
-.sname{color:#C4953A;font-size:12px;font-weight:500;margin-bottom:3px}
-.sdist{color:#F3EDD8;font-size:28px;font-weight:700;line-height:1}
-.sdist span{font-size:13px;font-weight:400;color:#8FAD9E}
-.stxt{color:#8FAD9E;font-size:12px;line-height:1.5;max-width:240px}
-.btn{background:#C4953A;color:#1B3A28;border:none;border-radius:9px;padding:10px 22px;font-size:13px;font-weight:600;cursor:pointer;transition:opacity .2s}
+body{background:#1B3A28;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:system-ui,-apple-system,sans-serif;padding:20px}
+.wrap{text-align:center;max-width:360px;width:100%}
+.brand{color:#C4953A;font-size:11px;font-weight:600;letter-spacing:.1em;margin-bottom:6px}
+h1{color:#F3EDD8;font-size:22px;font-weight:700;margin-bottom:6px}
+.tagline{color:#8FAD9E;font-size:13px;line-height:1.5;margin-bottom:24px;min-height:20px;transition:all .4s}
+.cx{display:flex;justify-content:center;margin-bottom:12px}
+.info{min-height:76px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.sname{color:#C4953A;font-size:13px;font-weight:500;margin-bottom:4px}
+.sdist{color:#F3EDD8;font-size:34px;font-weight:700;line-height:1}
+.sdist span{font-size:14px;font-weight:400;color:#8FAD9E}
+.stxt{color:#8FAD9E;font-size:13px;line-height:1.55;max-width:260px}
+.btn{background:#C4953A;color:#1B3A28;border:none;border-radius:10px;padding:13px 28px;font-size:14px;font-weight:600;cursor:pointer;transition:opacity .2s}
 .btn:hover{opacity:.85}
-.dots{display:flex;gap:5px;justify-content:center;margin-top:8px}
+.dots{display:flex;gap:5px;justify-content:center;margin-top:10px}
 .dot{width:6px;height:6px;border-radius:50%;background:#C4953A;animation:pulse 1.2s infinite}
 .dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+.hint{color:#4A7A60;font-size:11px;margin-top:16px;opacity:.75}
 #ng{transform-origin:150px 150px;transition:transform 1.4s cubic-bezier(.34,1.56,.64,1)}
 @keyframes pulse{0%,100%{opacity:.2}50%{opacity:1}}
+/* Kompakt inbäddningsläge */
+body.embed{min-height:0;padding:6px 8px 10px}
+body.embed .brand,body.embed h1,body.embed .hint{display:none}
+body.embed .tagline{font-size:11px;margin-bottom:4px;min-height:14px}
+body.embed .cx{margin-bottom:4px}
+body.embed .cx svg{width:228px!important;height:228px!important}
+body.embed .info{min-height:44px}
+body.embed .sdist{font-size:22px}
+body.embed .sname{font-size:11px}
+body.embed .btn{padding:8px 18px;font-size:12px}
+body.embed .stxt{font-size:11px}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <svg width="260" height="260" viewBox="0 0 300 300">
-    <defs>
-      <radialGradient id="fG" cx="38%" cy="32%">
-        <stop offset="0%" stop-color="#FAF5E5"/>
-        <stop offset="100%" stop-color="#E4D9BC"/>
-      </radialGradient>
-      <radialGradient id="bG">
-        <stop offset="0%" stop-color="#1F4233"/>
-        <stop offset="100%" stop-color="#0F2416"/>
-      </radialGradient>
-    </defs>
-    <circle cx="150" cy="150" r="147" fill="#0F2416" opacity="0.5"/>
-    <circle cx="150" cy="150" r="143" fill="url(#bG)"/>
-    <g id="tks"></g>
-    <circle cx="150" cy="150" r="126" fill="none" stroke="#C4953A" stroke-width="1.5"/>
-    <circle cx="150" cy="150" r="123" fill="none" stroke="#C4953A" stroke-width="0.5" opacity="0.3"/>
-    <circle cx="150" cy="150" r="118" fill="url(#fG)"/>
-    <line x1="150" y1="37" x2="150" y2="263" stroke="#C8BBAA" stroke-width="0.6" opacity="0.35"/>
-    <line x1="37" y1="150" x2="263" y2="150" stroke="#C8BBAA" stroke-width="0.6" opacity="0.35"/>
-    <line x1="66" y1="66" x2="234" y2="234" stroke="#C8BBAA" stroke-width="0.4" opacity="0.2"/>
-    <line x1="234" y1="66" x2="66" y2="234" stroke="#C8BBAA" stroke-width="0.4" opacity="0.2"/>
-    <text x="150" y="48" text-anchor="middle" dominant-baseline="middle" fill="#1B3A28" font-size="18" font-weight="700">N</text>
-    <text x="150" y="254" text-anchor="middle" dominant-baseline="middle" fill="#1B3A28" font-size="15" font-weight="600">S</text>
-    <text x="255" y="151" text-anchor="middle" dominant-baseline="middle" fill="#1B3A28" font-size="15" font-weight="600">Ö</text>
-    <text x="45" y="151" text-anchor="middle" dominant-baseline="middle" fill="#1B3A28" font-size="15" font-weight="600">V</text>
-    <text x="221" y="79" text-anchor="middle" dominant-baseline="middle" fill="#8A8070" font-size="11">NO</text>
-    <text x="221" y="223" text-anchor="middle" dominant-baseline="middle" fill="#8A8070" font-size="11">SO</text>
-    <text x="79" y="223" text-anchor="middle" dominant-baseline="middle" fill="#8A8070" font-size="11">SV</text>
-    <text x="79" y="79" text-anchor="middle" dominant-baseline="middle" fill="#8A8070" font-size="11">NV</text>
-    <g id="ng">
-      <path d="M150 57 L142 148 L150 163 L158 148Z" fill="#C4953A"/>
-      <path d="M150 57 L147 118 L150 163Z" fill="rgba(255,220,100,0.22)"/>
-      <path d="M150 210 L154 158 L150 163 L146 158Z" fill="#C4953A" opacity="0.35"/>
-      <circle cx="150" cy="150" r="11" fill="#1B3A28" stroke="#C4953A" stroke-width="2.5"/>
-      <circle cx="150" cy="150" r="4" fill="#C4953A"/>
-    </g>
-  </svg>
-
+  <div class="brand">MÄRKESNAMN</div>
+  <h1>Systembolags-kompassen</h1>
+  <div class="tagline" id="tg">Alltid på väg mot närmaste system</div>
+  <div class="cx">
+    <svg width="280" height="280" viewBox="0 0 300 300">
+      <defs>
+        <radialGradient id="fG" cx="38%" cy="32%">
+          <stop offset="0%" stop-color="#FAF5E5"/>
+          <stop offset="100%" stop-color="#E4D9BC"/>
+        </radialGradient>
+        <radialGradient id="bG">
+          <stop offset="0%" stop-color="#1F4233"/>
+          <stop offset="100%" stop-color="#0F2416"/>
+        </radialGradient>
+      </defs>
+      <circle cx="150" cy="150" r="147" fill="#0F2416" opacity="0.5"/>
+      <circle cx="150" cy="150" r="143" fill="url(#bG)"/>
+      <g id="tks"></g>
+      <circle cx="150" cy="150" r="126" fill="none" stroke="#C4953A" stroke-width="1.5"/>
+      <circle cx="150" cy="150" r="123" fill="none" stroke="#C4953A" stroke-width="0.5" opacity="0.3"/>
+      <circle cx="150" cy="150" r="118" fill="url(#fG)"/>
+      <line x1="150" y1="37" x2="150" y2="263" stroke="#C8BBAA" stroke-width="0.6" opacity="0.35"/>
+      <line x1="37" y1="150" x2="263" y2="150" stroke="#C8BBAA" stroke-width="0.6" opacity="0.35"/>
+      <line x1="66" y1="66" x2="234" y2="234" stroke="#C8BBAA" stroke-width="0.4" opacity="0.2"/>
+      <line x1="234" y1="66" x2="66" y2="234" stroke="#C8BBAA" stroke-width="0.4" opacity="0.2"/>
+      <text x="150" y="48" text-anchor="middle" dominant-baseline="middle" fill="#1B3A28" font-size="18" font-weight="700">N</text>
+      <text x="150" y="254" text-anchor="middle" dominant-baseline="middle" fill="#1B3A28" font-size="15" font-weight="600">S</text>
+      <text x="255" y="151" text-anchor="middle" dominant-baseline="middle" fill="#1B3A28" font-size="15" font-weight="600">Ö</text>
+      <text x="45" y="151" text-anchor="middle" dominant-baseline="middle" fill="#1B3A28" font-size="15" font-weight="600">V</text>
+      <text x="221" y="79" text-anchor="middle" dominant-baseline="middle" fill="#8A8070" font-size="11">NO</text>
+      <text x="221" y="223" text-anchor="middle" dominant-baseline="middle" fill="#8A8070" font-size="11">SO</text>
+      <text x="79" y="223" text-anchor="middle" dominant-baseline="middle" fill="#8A8070" font-size="11">SV</text>
+      <text x="79" y="79" text-anchor="middle" dominant-baseline="middle" fill="#8A8070" font-size="11">NV</text>
+      <g id="ng">
+        <!-- Pil mot Systembolaget -->
+        <path d="M150 52 L142 150 L150 168 L158 150Z" fill="#C4953A"/>
+        <path d="M150 52 L147 110 L150 168Z" fill="rgba(255,220,100,0.25)"/>
+        <!-- Liten svans för balans -->
+        <path d="M150 210 L154 158 L150 168 L146 158Z" fill="#C4953A" opacity="0.35"/>
+        <circle cx="150" cy="150" r="11" fill="#1B3A28" stroke="#C4953A" stroke-width="2.5"/>
+        <circle cx="150" cy="150" r="4" fill="#C4953A"/>
+      </g>
+      <circle id="gr" cx="150" cy="150" r="148" fill="none" stroke="#C4953A" stroke-width="1.5" opacity="0" style="transition:opacity .6s"/>
+    </svg>
+  </div>
   <div class="info" id="inf">
     <button class="btn" onclick="go()">Hitta närmaste Systembolaget</button>
   </div>
+  <p class="hint">Nålen justerar sig efter din telefonriktning</p>
 </div>
 
 <script>
+// Tick marks
 const tg=document.getElementById('tks');
 for(let i=0;i<72;i++){
   const d=i*5,r=d*Math.PI/180,c=d%90===0,m=d%45===0&&d%90!==0;
   const oR=143,iR=c?oR-16:m?oR-11:oR-6;
   const l=document.createElementNS('http://www.w3.org/2000/svg','line');
-  l.setAttribute('x1',150+oR*Math.sin(r));l.setAttribute('y1',150-oR*Math.cos(r));
-  l.setAttribute('x2',150+iR*Math.sin(r));l.setAttribute('y2',150-iR*Math.cos(r));
+  l.setAttribute('x1',150+oR*Math.sin(r)); l.setAttribute('y1',150-oR*Math.cos(r));
+  l.setAttribute('x2',150+iR*Math.sin(r)); l.setAttribute('y2',150-iR*Math.cos(r));
   l.setAttribute('stroke',c?'#C4953A':m?'#6B9B7A':'#4A7A60');
   l.setAttribute('stroke-width',c?'2':m?'1.2':'0.7');
   l.setAttribute('stroke-linecap','round');
   tg.appendChild(l);
 }
 
-const ng=document.getElementById('ng'),inf=document.getElementById('inf');
-let bearing=0,alpha=0,disp=0,active=false;
+// Aktivera kompakt läge + autostart vid ?embed=1
+if(new URLSearchParams(location.search).has('embed')){
+  document.body.classList.add('embed');
+  window.addEventListener('load', ()=> setTimeout(go, 300));
+}
+const ng=document.getElementById('ng'), gr=document.getElementById('gr'),
+      inf=document.getElementById('inf'), tgl=document.getElementById('tg');
+let bearing=0, alpha=0, disp=0, active=false;
 
-function rot(){const diff=((bearing-alpha-disp)%360+540)%360-180;disp+=diff;ng.style.transform=`rotate(${disp}deg)`;}
+function rot(){
+  const diff=((bearing-alpha-disp)%360+540)%360-180;
+  disp+=diff;
+  ng.style.transform=`rotate(${disp}deg)`;
+}
+
 ['deviceorientationabsolute','deviceorientation'].forEach(ev=>{
-  window.addEventListener(ev,e=>{const a=e.webkitCompassHeading??e.alpha??0;if(ev==='deviceorientation'&&e.absolute)return;alpha=a;if(active)rot();},true);
+  window.addEventListener(ev,e=>{
+    const a=e.webkitCompassHeading??e.alpha??0;
+    if(ev==='deviceorientation'&&e.absolute)return;
+    alpha=a; if(active)rot();
+  },true);
 });
-function bea(la1,lo1,la2,lo2){const f1=la1*Math.PI/180,f2=la2*Math.PI/180,dl=(lo2-lo1)*Math.PI/180;return(Math.atan2(Math.sin(dl)*Math.cos(f2),Math.cos(f1)*Math.sin(f2)-Math.sin(f1)*Math.cos(f2)*Math.cos(dl))*180/Math.PI+360)%360;}
-function dst(la1,lo1,la2,lo2){const R=6371,f1=la1*Math.PI/180,f2=la2*Math.PI/180,df=(la2-la1)*Math.PI/180,dl=(lo2-lo1)*Math.PI/180;const a=Math.sin(df/2)**2+Math.cos(f1)*Math.cos(f2)*Math.sin(dl/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
-function nearest(la,lo,s){return s.reduce((b,x)=>dst(la,lo,x.la,x.lo)<dst(la,lo,b.la,b.lo)?x:b);}
-function load(m){inf.innerHTML=`<div class="stxt">${m}</div><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;}
+
+function bea(la1,lo1,la2,lo2){
+  const f1=la1*Math.PI/180, f2=la2*Math.PI/180, dl=(lo2-lo1)*Math.PI/180;
+  return(Math.atan2(Math.sin(dl)*Math.cos(f2), Math.cos(f1)*Math.sin(f2)-Math.sin(f1)*Math.cos(f2)*Math.cos(dl))*180/Math.PI+360)%360;
+}
+function dst(la1,lo1,la2,lo2){
+  const R=6371, f1=la1*Math.PI/180, f2=la2*Math.PI/180,
+        df=(la2-la1)*Math.PI/180, dl=(lo2-lo1)*Math.PI/180;
+  const a=Math.sin(df/2)**2+Math.cos(f1)*Math.cos(f2)*Math.sin(dl/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+function nearest(la,lo,stores){
+  return stores.reduce((b,s)=>dst(la,lo,s.la,s.lo)<dst(la,lo,b.la,b.lo)?s:b);
+}
+function setLoad(m){
+  inf.innerHTML=`<div class="stxt">${m}</div><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+}
 
 async function go(){
-  if(!navigator.geolocation){inf.innerHTML='<div class="stxt">GPS stöds inte här.</div>';return;}
-  load('Hämtar position...');
+  if(!navigator.geolocation){
+    inf.innerHTML='<div class="stxt">GPS stöds inte i den här webbläsaren.</div>'; return;
+  }
+  setLoad('Hämtar din position...');
+
   navigator.geolocation.getCurrentPosition(async({coords:{latitude:la,longitude:lo}})=>{
-    load('Söker närmaste system...');
-    let st=[];
+    setLoad('Söker efter systembolag nära dig...');
+
+    // Hämtar ALLA Systembolaget inom 200 km — täcker hela Sverige oavsett var du är
+    const query=`[out:json][timeout:20];
+      node["name"="Systembolaget"](around:200000,${la},${lo});
+      out body;`;
+
+    let stores=[];
     try{
-      const q=`[out:json][timeout:12];node["name"="Systembolaget"](around:200000,${la},${lo});out body;`;
-      const r=await fetch('https://overpass-api.de/api/interpreter',{method:'POST',body:'data='+encodeURIComponent(q)});
-      const d=await r.json();
-      st=d.elements.filter(e=>e.lat&&e.lon).map(e=>({n:e.tags?.['addr:city']?`Systembolaget ${e.tags['addr:city']}`:'Systembolaget',la:e.lat,lo:e.lon}));
-    }catch(e){}
-    if(!st.length){inf.innerHTML='<div class="stxt">Kunde inte hämta data. Försök igen.</div>';return;}
-    const nr=nearest(la,lo,st);
+      const res=await fetch('https://overpass-api.de/api/interpreter',{
+        method:'POST',
+        body:'data='+encodeURIComponent(query)
+      });
+      const data=await res.json();
+      stores=data.elements
+        .filter(e=>e.lat&&e.lon)
+        .map(e=>{
+          const city=e.tags?.['addr:city']||e.tags?.['addr:suburb']||'';
+          return {n: city ? `Systembolaget ${city}` : 'Systembolaget', la:e.lat, lo:e.lon};
+        });
+    }catch(err){}
+
+    if(stores.length===0){
+      inf.innerHTML='<div class="stxt">Kunde inte hämta data just nu. Kontrollera din internetanslutning och försök igen.</div>';
+      return;
+    }
+
+    const nr=nearest(la,lo,stores);
     const km=dst(la,lo,nr.la,nr.lo);
     bearing=bea(la,lo,nr.la,nr.lo);
-    active=true;rot();
-    inf.innerHTML=`<div class="sname">${nr.n}</div><div class="sdist">${km.toFixed(1)} <span>km bort</span></div>`;
-  },
-  ()=>inf.innerHTML='<div class="stxt">Tillåt GPS i webbläsaren.</div>',
-  {enableHighAccuracy:true,timeout:10000});
+    active=true; rot(); gr.style.opacity='0.3';
+
+    tgl.textContent = km<0.3 ? 'Du är redan där!' :
+                      km<1   ? 'Runt hörnet!' :
+                      km<3   ? 'Nästan framme!' :
+                      km<8   ? 'En liten resa bort' : 'God resa, hjälten!';
+
+    inf.innerHTML=`
+      <div class="sname">${nr.n}</div>
+      <div class="sdist">${km.toFixed(1)} <span>km bort</span></div>`;
+
+  }, ()=>{
+    inf.innerHTML='<div class="stxt">Platsåtkomst nekad. Tillåt GPS i webbläsaren och försök igen.</div>';
+  },{enableHighAccuracy:true, timeout:10000});
 }
 </script>
 </body>
